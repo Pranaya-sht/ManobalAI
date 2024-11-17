@@ -1,8 +1,5 @@
-# import groq
 
 import os
-
-
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.prompts import ChatPromptTemplate
@@ -10,16 +7,19 @@ from langchain_community.document_loaders import CSVLoader
 from langchain_groq import ChatGroq
 from langchain_community.vectorstores import DocArrayInMemorySearch
 from langchain_community.embeddings import SentenceTransformerEmbeddings
+from pydantic import BaseModel
 from typing import Dict, Any
 from pydantic import BaseModel
-# from transformers import pipeline
+from dotenv import load_dotenv
 
 
-os.environ["GROQ_API_KEY"] = "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"
+dotenv = load_dotenv()
 
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+conversation_data = {"conversation": []}
 
-
+MAX_CONVERSATIONS = 30
     
 def setup_chain() -> create_retrieval_chain:
     """
@@ -105,5 +105,5 @@ class QueryRequest(BaseModel):
 
 
         
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="127.0.0.1", port=8000)
