@@ -12,7 +12,7 @@ from Quotes.api import *
 import uvicorn
 
 
-
+conversation_data = {"conversation": []}
 
 app = FastAPI()
 
@@ -38,6 +38,7 @@ def analyze_emotion_endpoint(request: EmotionRequest):
 def generate_graph_endpoint():
     graph_path = "Emotion/"+generate_graph()
     return FileResponse(graph_path, media_type="image/png")
+
 @app.post("/prompt")
 async def process_prompt(query_data: QueryRequest) -> Dict[str, Any]:
     """
@@ -53,12 +54,31 @@ async def process_prompt(query_data: QueryRequest) -> Dict[str, Any]:
                 "status": "success"
             }
 
-        # Regular query processing
-        response = chain.invoke({"input": query})
+
+        past_conversations = "\n".join([
+            f"Human: {item['human']}\nBot: {item['bot']}"
+            for item in conversation_data["conversation"]
+        ])
+        current_input = f"{past_conversations}\nHuman: {query}"
         
-        print("Response: ", response)
-        
+        response = chain.invoke({"input": current_input})
         answer = response.get('answer', '').strip()
+        
+        
+        conversation_data["conversation"].append({
+            "human": query,
+            "bot": answer
+        })
+        
+        if len(conversation_data["conversation"]) > MAX_CONVERSATIONS:
+            conversation_data["conversation"] = conversation_data["conversation"][-MAX_CONVERSATIONS:]
+            return {
+                "response": "Conversation history limit reached. Please start a new conversation.",
+                "status": "limit_reached",
+            }
+            
+        print(f"Conversation Data: {conversation_data}")
+
             
         if not answer:
             return {
@@ -66,9 +86,7 @@ async def process_prompt(query_data: QueryRequest) -> Dict[str, Any]:
                 "status": "success"
             }
         
-            
-        print("HIIIIIIIIiiii")
-            
+                    
         return {
             "response": answer,
             "status": "success"
