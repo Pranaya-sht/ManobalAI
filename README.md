@@ -1,4 +1,4 @@
-# mental-health-bot
+# ManobalAI
 
 1. Create a file called .env.local inside the frontend folder and add these in:
    
