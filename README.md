@@ -9,7 +9,7 @@
 
    ii. Create a file called .env inside backend/ManobalAI and add this in:
 
-   GROQ_API_KEY = "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
+   GROQ_API_KEY = "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"
 
 3. Go to the frontend folder and type this in the terminal:
  npm install
